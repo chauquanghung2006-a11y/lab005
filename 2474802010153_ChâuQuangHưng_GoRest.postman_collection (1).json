@@ -1,0 +1,312 @@
+{
+  "info": {
+    "_postman_id": "f6b580d3-1577-42cd-ae66-97cdac70a794",
+    "name": "2474802010153_ChâuQuangHưng_GoRest",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "59055882",
+    "_collection_link": "https://go.postman.co/collection/59055882-f6b580d3-1577-42cd-ae66-97cdac70a794?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Positive_TCs",
+      "item": [
+        {
+          "name": "Create User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r\n // 1. Kiểm tra xem hệ thống có trả về đúng mã 201 Created không\r\npm.test(\"Tạo User thành công (Status 201)\", function () {\r\n    pm.response.to.have.status(201);\r\n});\r\n\r\n// 2. Bóc tách dữ liệu JSON do máy chủ trả về\r\nvar jsonData = pm.response.json();\r\n\r\n// 3. Trích xuất id của user đó và lưu vào biến môi trường\r\nif (jsonData.id) {\r\n    pm.environment.set(\"userId\", jsonData.id);\r\n    console.log(\"Đã lưu User ID: \" + jsonData.id);\r\n}\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Hung Test New\",\r\n  \"gender\": \"male\",\r\n  \"email\": \"hung.{{$randomInt}}@example.com\",\r\n  \"status\": \"active\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/public/v2/users",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "public",
+                "v2",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Tìm thấy User (Status 200)\", function () {\r\n    pm.response.to.have.status(200);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseurl}}/public/v2/users/{{userId}}",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "public",
+                "v2",
+                "users",
+                "{{userId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r\npm.test(\"Cập nhật User thành công (Status 200)\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Trạng thái User là inactive\", function () {\r\n    var jsonData = pm.response.json();\r\n    pm.expect(jsonData.status).to.eql(\"inactive\");\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n{\r\n  \"status\": \"inactive\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/public/v2/users/{{userId}}",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "public",
+                "v2",
+                "users",
+                "{{userId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Inactive User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Xóa User thành công (Status 204)\", function () {\r\n    pm.response.to.have.status(204);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/public/v2/users/{{userId}}",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "public",
+                "v2",
+                "users",
+                "{{userId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Teardown: Delete All Users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r\npm.test(\"Từ chối tạo User khi không có Token\", function () {\r\n    pm.expect(pm.response.code).to.be.oneOf([401, 403]);\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer{{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Hung Test New\",\r\n  \"gender\": \"male\",\r\n  \"email\": \"$randomInt}}@example.com\",\r\n  \"status\": \"active\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/public/v2/users",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "public",
+                "v2",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{token}}",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Negative_TCs",
+      "item": [
+        {
+          "name": "Create User with Invalid Authentication",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Từ chối tạo User khi không có Token\", function () {\r\n    pm.expect(pm.response.code).to.be.oneOf([401, 403]);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n{\r\n  \"name\": \"Invalid Auth Test\",\r\n  \"gender\": \"male\",\r\n  \"email\": \"invalid.auth.20261022@example.com\",\r\n  \"status\": \"active\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/public/v2/users",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "public",
+                "v2",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create User with Duplicate Email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r\npm.test(\"Từ chối email đã tồn tại (Status 422)\", function () {\r\n    pm.response.to.have.status(422);\r\n});\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n{\r\n  \"name\": \"Duplicate Email Test\",\r\n  \"gender\": \"male\",\r\n  \"email\": \"hung.test.20261022@example.com\",\r\n  \"status\": \"active\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseurl}}/public/v2/users",
+              "host": [
+                "{{baseurl}}"
+              ],
+              "path": [
+                "public",
+                "v2",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
